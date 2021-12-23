@@ -1,0 +1,742 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Game catalog is a JSON document of the following structure (all data types are strings, if not specified otherwise):",
+    "version": "1.0.6",
+    "title": "Game catalog"
+  },
+  "tags": [
+    {
+      "name": "categories",
+      "description": "root for games categories"
+    },
+    {
+      "name": "Set user data",
+      "description": "This method will accept userData, update or create session and return its information to caller."
+    },
+    {
+      "name": "Get user session",
+      "description": "This method will return active session information for provided userId, if such exists. If not, new session won’t be created and server will respond with HTTP status code 404."
+    },
+    {
+      "name": "Get user balance",
+      "description": "This method will return user balance information for provided userId, if there is an existing user account with matching optional currency parameter (or last used/currently used currency, if currency parameter is not provided). If no matching account exists, server will respond with HTTP status code 404."
+    },
+    {
+      "name": "Deposit",
+      "description": "This method will perform deposit to Original Spirit account, associated with userId and return the resulted user balance. If operation with such refId already exists in our system, no action will be performed."
+    },
+    {
+      "name": "Withdraw",
+      "description": "This method will perform withdraw from Original Spirit account, associated with userId and return the resulted withdraw result. If operation with such refId already exists in our system, no action will be performed, and withdraw result will contain data for previous operation with such refId."
+    },
+    {
+      "name": "Withdraw all",
+      "description": "This method will reset user balance, if any – by withdrawing from it to threshold value – and returning the result value. amount field is ignored. If operation with such refId already exists in our system, no action will be performed, and withdraw result will contain data for previous operation with such refId."
+    },
+    {
+      "name": "Balance",
+      "description": "This method is called to retrieve user balance. Integrators must check existing identifiers in their database to avoid operation duplication. Integrators reserve/take funds from user account and return resulted balance if operation is success, or return failure HTTP code otherwise."
+    }
+  ],
+  "paths": {
+    "/categories": {
+      "post": {
+        "tags": [
+          "categories"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "categories",
+            "description": "root for games categories",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ResponseUser"
+            }
+          }
+        }
+      }
+    },
+    "/set_user_data": {
+      "post": {
+        "tags": [
+          "Set user data"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Pet object that needs to be added to the store",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RequestUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ResponseUser"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/get_user_session": {
+      "get": {
+        "tags": [
+          "Get user session"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "this field contains id of user in integrators system",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserSession"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/get_user_balance": {
+      "get": {
+        "tags": [
+          "Get user balance"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "this field contains id of user in integrators system",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "currency",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserBalance"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/deposit": {
+      "post": {
+        "tags": [
+          "Deposit"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RequestDeposit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ResponseDeposit"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/withdraw": {
+      "post": {
+        "tags": [
+          "Withdraw"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RequestWithdraw"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ResponseWithdraw"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/withdraw_all": {
+      "post": {
+        "tags": [
+          "Withdraw all"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RequestWithdrawAll"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ResponseWithdrawAll"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/callback": {
+      "get": {
+        "tags": [
+          "Balance"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "this field contains id of user in integrators system",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserSession"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Authorization token"
+    }
+  },
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "category identifier",
+          "example": "all"
+        },
+        "Title": {
+          "type": "string",
+          "description": "category title",
+          "example": "All games"
+        },
+        "games": {
+          "type": "array",
+          "description": "array, games for this category",
+          "items": {
+            "$ref": "#/definitions/Games"
+          }
+        }
+      }
+    },
+    "Games": {
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "type": "string",
+          "description": "parent category identifier",
+          "example": "roulette"
+        },
+        "ID": {
+          "type": "string",
+          "description": "unique game identifier, cannot be changed, used for seamless callbacks",
+          "example": 100169
+        },
+        "gameId": {
+          "type": "string",
+          "description": "game class identifier",
+          "example": "roulette2"
+        },
+        "instanceID": {
+          "type": "string",
+          "description": "instacne class identifier",
+          "example": "OS_Roulette_2"
+        },
+        "title": {
+          "type": "string",
+          "description": "game title",
+          "example": "VIP Roulette"
+        },
+        "modes": {
+          "type": "array",
+          "description": "array, available game modes",
+          "items": {
+            "$ref": "#/definitions/Modes"
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "game description"
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "url to small thumbnail",
+          "example": "\\/\\/static.ssl256bit.com\\/_Uploads\\/uploaded\\/CasinoTV\\/Thumbnails\\/OS_Roulette_2.jpg?_rand=20210728144531"
+        },
+        "featuredUrl": {
+          "type": "string",
+          "description": "url to large game-related image"
+        },
+        "layout": {
+          "type": "array",
+          "description": "structure with game layout information",
+          "items": {
+            "$ref": "#/definitions/Layout"
+          }
+        },
+        "popularityRank": {
+          "type": "string",
+          "example": 0
+        },
+        "loaderUrl": {
+          "type": "string",
+          "description": "base url for game loader, including protocol prefix. Integrators may be required to append additional parameters to it.",
+          "example": "https:\\/\\/gateway.ssl256bit.com\\/catalogs\\/game\\/?gameId=OS_Roulette_2&referenceId=100014"
+        },
+        "tags": {
+          "type": "string",
+          "example": "live"
+        }
+      }
+    },
+    "Modes": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "mode identifier",
+          "example": "Fun"
+        },
+        "mode": {
+          "type": "string",
+          "description": "mode type (can be REAL (real funds involved) or FUN (fun funds involved))",
+          "example": "Fun"
+        },
+        "title": {
+          "type": "string",
+          "description": "game orientation on screen, can be Portrait, Landscape or PortraitLandscape for universal design.",
+          "example": "Fun"
+        }
+      }
+    },
+    "Layout": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/Default"
+        },
+        "mobile": {
+          "$ref": "#/definitions/Mobile"
+        }
+      }
+    },
+    "Default": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "description": "game orientation on screen, can be Portrait, Landscape or PortraitLandscape for universal design.",
+          "example": "PortraitLandscape"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "description": "optional field with game aspect information in case game has a fixed layout, in widthxheight format. Sample: 4x3, 16x9.",
+          "example": "16x9"
+        }
+      }
+    },
+    "Mobile": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "description": "game orientation on screen, can be Portrait, Landscape or PortraitLandscape for universal design.",
+          "example": "Portrait"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "description": "optional field with game aspect information in case game has a fixed layout, in widthxheight format. Sample: 4x3, 16x9.",
+          "example": "9x16"
+        }
+      }
+    },
+    "RequestUser": {
+      "type": "object",
+      "properties": {
+        "UserId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "UserName": {
+          "type": "string",
+          "description": "unique string user identifier in integrators system. This field will be used for reports purposes",
+          "example": "Jack"
+        },
+        "Nick": {
+          "type": "string",
+          "description": "this field contains common name/nick of user in integrators system. This field will be displayed in games as player identifier",
+          "example": "BigJack"
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        },
+        "reference": {
+          "type": "string",
+          "description": "this field contains domain for source web-site, where user came from",
+          "example": "vbet.com"
+        }
+      }
+    },
+    "ResponseUser": {
+      "type": "object",
+      "properties": {
+        "UserId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "sessionToken": {
+          "type": "string",
+          "description": "this field contains session token, which should be used by integrator system when forming game loader url",
+          "example": "abc123"
+        },
+        "expirationToken": {
+          "type": "string",
+          "format": "date-time",
+          "description": "this field contains session expiration date, GMT",
+          "example": "11.10.2021 18:18:18"
+        }
+      }
+    },
+    "UserSession": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "sessionToken": {
+          "type": "string",
+          "description": "this field contains session token, which should be used by integrator system when forming game loader url",
+          "example": "abc123"
+        },
+        "expirationToken": {
+          "type": "string",
+          "format": "date-time",
+          "description": "this field contains session expiration date, GMT",
+          "example": "11.10.2021 18:18:18"
+        }
+      }
+    },
+    "UserBalance": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "masterBalance": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "his field contains master balance",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        }
+      }
+    },
+    "RequestDeposit": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "amount": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "mount to transfer",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        },
+        "refId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "his field contains reference identifier for transaction. It’s required to exclude the transfer duplication – so for each unique operation it should be unique amongst the sender system.",
+          "example": 1
+        }
+      }
+    },
+    "ResponseDeposit": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "masterBalance": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "his field contains master balance",
+          "example": 100
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        }
+      }
+    },
+    "RequestWithdraw": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "amount": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "mount to transfer",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency",
+          "example": "USD"
+        },
+        "refId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "his field contains reference identifier for transaction. It’s required to exclude the transfer duplication – so for each unique operation it should be unique amongst the sender system.",
+          "example": 1
+        }
+      }
+    },
+    "ResponseWithdraw": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "withdrawAmount": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "amount which was withdrawn from user balance",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        },
+        "balance": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "this field contains resulted user balance",
+          "example": 90
+        }
+      }
+    },
+    "RequestWithdrawAll": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "amount": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "mount to transfer",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency",
+          "example": "USD"
+        },
+        "refId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "his field contains reference identifier for transaction. It’s required to exclude the transfer duplication – so for each unique operation it should be unique amongst the sender system.",
+          "example": 1
+        }
+      }
+    },
+    "ResponseWithdrawAll": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "int64",
+          "description": "this field contains id of user in integrators system",
+          "example": 101
+        },
+        "withdrawAmount": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "amount which was withdrawn from user balance",
+          "example": 10
+        },
+        "currency": {
+          "type": "string",
+          "description": "currency",
+          "example": "USD"
+        },
+        "balance": {
+          "type": "number",
+          "multipleOf": 0.1,
+          "description": "this field contains resulted user balance",
+          "example": 90
+        }
+      }
+    }
+  }
+}
